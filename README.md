@@ -31,6 +31,7 @@ See the full license text at: https://mariadb.com/bsl11/
 - `pnpm download-python` once before dev (pulls embedded Python into `resources/python`, used to parse user `config.py`).
 - `pnpm dev:win` to start
 - `pnpm build:win` to build. Please notice the windows policy over the program, security will block the build process. Use Power shell cmd `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser` to bypass.
+- **Windows 打包前先读 [`docs/windows-build-guide.md`](docs/windows-build-guide.md)** —— pnpm 版本要求、原生模块安装失败、四个下载源与镜像配置、成功构建的判定标准、构建后验证清单。
 
 ## 🛟 VERY USEFUL TIP
 
