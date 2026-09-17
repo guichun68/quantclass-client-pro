@@ -26,18 +26,31 @@ export async function updateProduct(product?: string) {
 
 		const isFuelBusy = await isKernalBusy("fuel")
 
+		if (isFuelBusy) {
+			logger.warn(
+				`跳过 ${product ?? "全部"} 数据增量更新：Fuel 内核正在执行其他任务`,
+			)
+			return {
+				status: "busy" as const,
+				message: "Fuel 内核正在执行其他任务，请稍后重试",
+			}
+		}
+
 		logger.info(`manually update ${product}`)
-		!isFuelBusy && product
+		product
 			? await execBin(["one_data", product], `增量更新-${product}`)
 			: await execBin(["all_data"], "全部数据增量更新")
 
 		return {
-			status: "success",
+			status: "success" as const,
 			message: `执行 ${product ?? "全部"} 数据增量更新`,
 		}
 	} catch (error) {
-		logger.error(error)
-		return
+		logger.error(`更新产品数据失败: ${error}`)
+		return {
+			status: "error" as const,
+			message: "执行数据增量更新失败",
+		}
 	}
 }
 

@@ -299,7 +299,7 @@ async function startRocketIfNeeded() {
  * 切换定时任务状态，前端启动或者停止定时任务的函数
  * @param {Boolean} isOn - 是否启用定时任务
  */
-const setAutoUpdate = (isOn: boolean) => {
+const setAutoUpdate = async (isOn: boolean): Promise<void> => {
 	systemState.isSetAutoUpdate = isOn
 	logger.info(`[fuel] 自动更新数据: ${systemState.isSetAutoUpdate}`)
 
@@ -312,7 +312,7 @@ const setAutoUpdate = (isOn: boolean) => {
 	// -- 启动定时任务
 	try {
 		// -- 启动新的任务
-		setupScheduler() // -- 调用 schedule 主进程
+		await setupScheduler() // -- 调用 schedule 主进程
 	} catch (error) {
 		// -- schedule 启动失败
 		systemState.isSetAutoUpdate = false
@@ -327,7 +327,7 @@ const setAutoUpdate = (isOn: boolean) => {
 	}
 }
 
-const setAutoTrading = (isOn: boolean) => {
+const setAutoTrading = async (isOn: boolean): Promise<boolean> => {
 	// TODO: 启动之前，要检查以下QMT的设置是否OK
 	systemState.isSetAutoTrading = isOn
 	logger.info(`[trade] 自动交易: ${systemState.isSetAutoTrading}`) // -- 记录日志
@@ -336,8 +336,18 @@ const setAutoTrading = (isOn: boolean) => {
 
 	// -- 如果启动实盘，自动更新也要开启
 	if (systemState.isSetAutoTrading) {
-		!systemState.isSetAutoUpdate && setAutoUpdate(true) // -- 如果自动交易开启，自动更新也要开启
+		if (!systemState.isSetAutoUpdate) {
+			await setAutoUpdate(true) // -- 如果自动交易开启，自动更新也要开启
+		}
+		if (!systemState.isSetAutoUpdate) {
+			systemState.isSetAutoTrading = false
+			_store.set("auto_real_trading", false)
+			logger.error("[trade] 自动更新数据启动失败，未开启自动实盘")
+			return false
+		}
 	}
+
+	return true
 }
 
 // ============================================================================

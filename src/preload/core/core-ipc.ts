@@ -20,7 +20,7 @@ import { ipcMain } from "electron"
 
 async function toggleHandler(): Promise<void> {
 	ipcMain.handle("toggle-handle", (_event: { sender: any }, isOn: boolean) => {
-		setAutoUpdate(isOn)
+		return setAutoUpdate(isOn)
 	})
 }
 
@@ -28,7 +28,7 @@ async function setAutoTradingHandler(): Promise<void> {
 	ipcMain.handle(
 		"set-auto-trading",
 		(_event: { sender: any }, isOn: boolean) => {
-			setAutoTrading(isOn)
+			return setAutoTrading(isOn)
 		},
 	)
 }

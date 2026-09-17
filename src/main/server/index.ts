@@ -16,7 +16,14 @@ import { logger as honoLogger } from "hono/logger"
 import { prettyJSON } from "hono/pretty-json"
 import { reportError } from "./controllers/error.js"
 import { createNotification } from "./controllers/notify.js"
-import { getProductStatus } from "./controllers/product.js"
+import {
+	getAutoUpdateStatus,
+	getAutoTradingStatus,
+	getProductStatus,
+	incrementalUpdate,
+	setAutoTradingStatus,
+	setAutoUpdateStatus,
+} from "./controllers/product.js"
 import { reportToast } from "./controllers/toast.js"
 import { errorHandler } from "./middleware/error.js"
 import type { Env } from "./types/index.js"
@@ -37,6 +44,15 @@ server.post("/error", reportError)
 
 // 产品状态路由
 server.get("/product-status", getProductStatus)
+server.post("/product/incremental-update", incrementalUpdate)
+
+// 订阅数据自动更新开关
+server.get("/auto-update", getAutoUpdateStatus)
+server.post("/auto-update", setAutoUpdateStatus)
+
+// 自动实盘开关；开启时会同步确保订阅数据自动更新已开启
+server.get("/auto-trading", getAutoTradingStatus)
+server.post("/auto-trading", setAutoTradingStatus)
 
 server.post("/toast", reportToast)
 

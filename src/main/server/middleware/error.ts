@@ -15,6 +15,7 @@ export const errorHandler = (): MiddlewareHandler => {
 	return async (c, next) => {
 		try {
 			await next()
+			if (c.finalized) return
 			return c.json({
 				code: 200,
 				message: "成功",
